@@ -1,0 +1,51 @@
+open System
+
+type Tree =
+    | Empty
+    | Node of int * Tree * Tree
+
+let rec insert value tree =
+    match tree with
+    | Empty -> Node(value, Empty, Empty)
+    | Node(v, left, right) ->
+        if value < v then Node(v, insert value left, right)
+        else Node(v, left, insert value right)
+
+let rec printTree tree ind =
+    match tree with
+    | Empty -> ()
+    | Node(value, left, right) ->
+        printTree right (ind + 4)
+        printfn "%s%d" (String.replicate ind " ") value
+        printTree left (ind + 4)
+
+let rec getInt() = 
+    let q = Console.ReadLine()
+    match Int32.TryParse(q) with
+    | (true, value) when value > 0 -> value
+    | _ ->
+        printfn "Input error: try positive integer"
+        getInt()
+
+let rec getFloat () =
+    let input = Console.ReadLine()
+    match Double.TryParse(input) with
+    | (true, value) -> value
+    | _ ->
+        printfn "Input error: floating-point number required"
+        getFloat()
+
+printf "Enter quantity of numbers: "
+let q = getInt()
+    
+let num =
+    [for _ in 1 .. q do
+       printf "Enter number: "
+       yield  getFloat()
+    ]
+
+let truncNumb = num |> List.map (fun x -> int(System.Math.Truncate x))   
+let tree = truncNumb |> List.fold (fun acc num -> insert num acc) Empty
+    
+printfn "Binary Search Tree:" 
+printTree tree 0
