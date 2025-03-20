@@ -19,33 +19,35 @@ let rec printTree tree ind =
         printfn "%s%d" (String.replicate ind " ") value
         printTree left (ind + 4)
 
-let rec getInt() = 
+let rec getNumb() = 
     let q = Console.ReadLine()
     match Int32.TryParse(q) with
-    | (true, value) when value > 0 -> value
+    | (true, value) when value > 0-> value
     | _ ->
-        printfn "Input error: try positive integer"
-        getInt()
-
-let rec getFloat () =
-    let input = Console.ReadLine()
-    match Double.TryParse(input) with
-    | (true, value) -> value
-    | _ ->
-        printfn "Input error: floating-point number required"
-        getFloat()
+        printfn "Input error: Try integer greater than 0"
+        getNumb()
 
 printf "Enter quantity of numbers: "
-let q = getInt()
+let q = getNumb()
     
-let num =
-    [for _ in 1 .. q do
-       printf "Enter number: "
-       yield  getFloat()
-    ]
+let rec buildFoldTree n tree =
+    if n = 0 then tree
+    else 
+       printfn "Enter number: "
+       let num = getNumb()
+       buildFoldTree (n - 1) (insert num tree)
 
-let truncNumb = num |> List.map (fun x -> int(System.Math.Truncate x))   
-let tree = truncNumb |> List.fold (fun acc num -> insert num acc) Empty
-    
+let rec foldForTree tree acc =
+    match tree with 
+    | Empty -> acc
+    | Node(v, Empty, Empty) -> tree :: acc
+    | Node(_, left, right) -> foldForTree left (foldForTree right acc)
+
+let tree = buildFoldTree q Empty
+let leavesList = foldForTree tree []
+
 printfn "Binary Search Tree:" 
 printTree tree 0
+printfn "List of Leaves: %A" leavesList
+
+
