@@ -30,26 +30,24 @@ let rec getNumb() =
 printf "Enter quantity of numbers: "
 let q = getNumb()
     
-let num =
-    [for _ in 1 .. q do
-       printf "Enter number: "
-       yield  getNumb()
-    ]
-    
-let tree = List.fold (fun acc num -> insert num acc) Empty num
+let rec buildFoldTree n tree =
+    if n = 0 then tree
+    else 
+       printfn "Enter number: "
+       let num = getNumb()
+       buildFoldTree (n - 1) (insert num tree)
 
-let rec inOrder tree = 
-    match tree with
-    | Empty -> []
-    | Node(_, left, right) ->
-        inOrder left @ [tree] @ inOrder right
+let rec foldForTree tree acc =
+    match tree with 
+    | Empty -> acc
+    | Node(v, Empty, Empty) -> tree :: acc
+    | Node(_, left, right) -> foldForTree left (foldForTree right acc)
 
-let leavesList =
-    inOrder tree |> List.fold (fun acc node ->
-        match node with
-        | Node(_, Empty, Empty) -> acc @ [node]
-        | _ -> acc) []
+let tree = buildFoldTree q Empty
+let leavesList = foldForTree tree []
 
 printfn "Binary Search Tree:" 
 printTree tree 0
 printfn "List of Leaves: %A" leavesList
+
+
